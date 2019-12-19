@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Properties;
+import java.util.UUID;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -24,14 +25,16 @@ public class FeedConsumerIntegrationTest {
     private static final String TOPIC_NAME = "tech_test";
     private static final int POLL_DURATION_TIMEOUT_MILLIS = 500;
     private static final String BOOTSTRAP_SERVERS = "localhost:9092";
-    private static final String PACKET = "|0|create|event|1497359166352|ee4d2439-e1c5-4cb7-98ad-9879b2fd84c2|Football|Sky Bet League Two|\\|Accrington\\| vs \\|Cambridge\\||1497359216693|0|1|";
     private boolean isRead = false;
 
     @Test
     public void shouldConsumeMessage() throws InterruptedException {
 
-        Thread consumer = new Thread( () -> isRead = testMessageRead());
-        Thread producer = new Thread( () -> sendMessage());
+        String randomID = UUID.randomUUID().toString();
+        String packet = "|0|create|event|1497359166352|"+ randomID +"|Football|Sky Bet League Two|\\|Accrington\\| vs \\|Cambridge\\||1497359216693|0|1|";
+
+        Thread consumer = new Thread( () -> isRead = testMessageRead(packet));
+        Thread producer = new Thread( () -> sendMessage(packet));
 
         consumer.start();
         producer.start();
@@ -52,7 +55,6 @@ public class FeedConsumerIntegrationTest {
 
     private Properties getKafkaProducerConfig() {
         Properties props = getKafkaCommonConfig();
-        //props.setProperty("auto.offset.reset", "latest");
         props.setProperty("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         props.setProperty("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         props.setProperty("transactional.id", "test");
@@ -68,7 +70,7 @@ public class FeedConsumerIntegrationTest {
         return props;
     }
 
-    private boolean testMessageRead() {
+    private boolean testMessageRead(String packet) {
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(getKafkaConsumerConfig());
         consumer.subscribe(Arrays.asList(TOPIC_NAME));
         boolean testMessageRead = false;
@@ -78,7 +80,7 @@ public class FeedConsumerIntegrationTest {
             ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(POLL_DURATION_TIMEOUT_MILLIS));
             retrievals++;
             for (ConsumerRecord record: records) {
-                if (record.value().toString().equals(PACKET)) {
+                if (record.value().toString().equals(packet)) {
                     testMessageRead = true;
                     break;
                 }
@@ -87,11 +89,11 @@ public class FeedConsumerIntegrationTest {
         return testMessageRead;
     }
 
-    private void sendMessage() {
+    private void sendMessage(String packet) {
             KafkaProducer producer = new KafkaProducer(getKafkaProducerConfig());
             producer.initTransactions();
             producer.beginTransaction();
-            producer.send(new ProducerRecord(TOPIC_NAME, PACKET));
+            producer.send(new ProducerRecord(TOPIC_NAME, packet));
             producer.commitTransaction();
             producer.flush();
             producer.close();
