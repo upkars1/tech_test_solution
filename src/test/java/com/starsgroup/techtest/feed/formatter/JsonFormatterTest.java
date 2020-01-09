@@ -17,7 +17,7 @@ public class JsonFormatterTest {
 
     @Test
     public void shouldFormat() {
-        String expected = "{\"header\":{\"msgId\":1,\"operation\":\"CREATE\",\"type\":\"EVENT\",\"timestamp\":2},\"body\":{\"name\":\"event-name-1\",\"displayed\":true,\"suspended\":false,\"eventId\":\"event-id-1\",\"category\":\"Football\",\"subCategory\":\"Champions League\",\"startTime\":3},\"markets\":[]}";
+        String expected = "{\"header\":{\"msgId\":1,\"operation\":\"CREATE\",\"type\":\"EVENT\",\"timestamp\":2},\"body\":{\"name\":\"event-name-1\",\"displayed\":true,\"suspended\":false,\"eventId\":\"event-id-1\",\"category\":\"Football\",\"subCategory\":\"Champions League\",\"startTime\":3}}";
         Header header = new Header( 1L , Operation.CREATE, PacketType.EVENT, 2L );
         EventBody body = new EventBody.Builder().withCategory( "Football" ).withDisplayed(true).withEventId("event-id-1")
                 .withName("event-name-1").withStartTime(3L).withSubCategory("Champions League").withSuspended(false).build();

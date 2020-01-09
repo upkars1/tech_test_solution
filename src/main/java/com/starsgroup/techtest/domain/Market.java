@@ -1,9 +1,6 @@
 package com.starsgroup.techtest.domain;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.*;
 
 public class Market {
 
@@ -11,16 +8,11 @@ public class Market {
 
     private MarketBody body;
 
-    private Collection<Outcome> outcomes = new ArrayList<>();
+    private LinkedList<Outcome> outcomes = new LinkedList<>();
 
     public Market(Header header, MarketBody body) {
-        this (header,body,Collections.emptyList());
-    }
-
-    public Market(Header header, MarketBody body, Collection<Outcome> outcomes) {
         this.header = header;
         this.body = body;
-        this.outcomes.addAll(outcomes);
     }
 
     public Header getHeader() {
@@ -39,16 +31,11 @@ public class Market {
         this.body = body;
     }
 
-    public Collection<Outcome> getOutcomes() {
-        return Collections.unmodifiableCollection(outcomes);
+    public void addOutcome(Outcome outcome) {
+        outcomes.addLast(outcome);
     }
 
-    public void setOutcomes(Outcome... outcomes) {
-        this.outcomes.clear();
-        addOutcomes(outcomes);
-    }
-
-    public void addOutcomes(Outcome... outcomes) {
-        this.outcomes.addAll(Arrays.asList(outcomes));
+    public boolean isInProgress( Outcome outcome ) {
+        return outcomes.getLast() == outcome;
     }
 }

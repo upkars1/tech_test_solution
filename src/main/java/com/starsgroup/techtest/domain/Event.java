@@ -1,24 +1,16 @@
 package com.starsgroup.techtest.domain;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.*;
 
 public class Event {
 
     private Header header;
     private EventBody body;
-    private Collection<Market> markets;;
+    private Collection<Market> markets = new LinkedList<>();
 
     public Event(Header header, EventBody body) {
-        this ( header , body , Collections.emptyList() );
-    }
-
-    public Event(Header header, EventBody body, Collection<Market> markets) {
         this.header = header;
         this.body = body;
-        this.markets = new ArrayList<>(markets);
     }
 
     public Header getHeader() {
@@ -37,16 +29,7 @@ public class Event {
         this.body = body;
     }
 
-    public Collection<Market> getMarkets() {
-        return Collections.unmodifiableCollection(markets);
-    }
-
-    public void setMarkets(Market... markets) {
-        this.markets.clear();
-        addMarkets(markets);
-    }
-
-    public void addMarkets(Market... markets) {
-        this.markets.addAll(Arrays.asList(markets));
+    public void setMarkets(Collection<Market> markets) {
+        this.markets = markets;
     }
 }

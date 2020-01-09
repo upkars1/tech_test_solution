@@ -5,12 +5,10 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Properties;
@@ -20,11 +18,11 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 @RunWith(MockitoJUnitRunner.class)
-public class FeedConsumerIntegrationTest {
+public class FeedConsumerIntegrationTest extends AbstractFeedConsumerTest {
 
     private static final String TOPIC_NAME = "tech_test";
     private static final int POLL_DURATION_TIMEOUT_MILLIS = 500;
-    private static final String BOOTSTRAP_SERVERS = "localhost:9092";
+
     private boolean isRead = false;
 
     @Test
@@ -45,13 +43,7 @@ public class FeedConsumerIntegrationTest {
         assertTrue( "Example message was not read by Kafka Consumer." , isRead );
     }
 
-    private Properties getKafkaConsumerConfig() {
-        Properties props = getKafkaCommonConfig();
-        props.setProperty("auto.offset.reset", "earliest");
-        props.setProperty("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-        props.setProperty("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-        return props;
-    }
+
 
     private Properties getKafkaProducerConfig() {
         Properties props = getKafkaCommonConfig();
@@ -61,20 +53,13 @@ public class FeedConsumerIntegrationTest {
         return props;
     }
 
-    private Properties getKafkaCommonConfig() {
-        Properties props = new Properties();
-        props.setProperty("bootstrap.servers", BOOTSTRAP_SERVERS);
-        props.setProperty("group.id", "test");
-        props.setProperty("enable.auto.commit", "true");
-        props.setProperty("auto.commit.interval.ms", "1000");
-        return props;
-    }
+
 
     private boolean testMessageRead(String packet) {
-        KafkaConsumer<String, String> consumer = new KafkaConsumer<>(getKafkaConsumerConfig());
+        KafkaConsumer<String, String> consumer = getKafkaConsumer();
         consumer.subscribe(Arrays.asList(TOPIC_NAME));
         boolean testMessageRead = false;
-        int max_retrievals = 5;
+        int max_retrievals = Integer.MAX_VALUE;
         int retrievals = 0;
         while ( !testMessageRead && retrievals < max_retrievals  ) {
             ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(POLL_DURATION_TIMEOUT_MILLIS));

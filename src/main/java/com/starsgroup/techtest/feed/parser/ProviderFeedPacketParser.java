@@ -13,7 +13,7 @@ public abstract class ProviderFeedPacketParser<T> {
     private static final char DELIMITER = '|';
     private static final char ESCAPE = '\\';
 
-    public final T parse ( ProviderFeedPacket packet ) {
+    public T parse ( ProviderFeedPacket packet ) {
         List<String> values = getValues(packet.getContent());
         Header header = getHeader(values);
         return getEntity( header, values );
